@@ -1,132 +1,53 @@
-// /////////////ANIA tutorial
-// const PORT = 8000
-// const axios = require('axios')
-// const cheerio = require('cheerio')
-// const express = require('express')
+const unirest = require("unirest");
+const cheerio = require("cheerio");
+const company= 'enhabit'     //company to google
+const keyword= 'enhabit'     //keyword to search within the returned results
+const zurl= `https://www.google.com/search?q=${company}&tbm=nws&source=lnt&tbs=qdr:h&sa`
 
-// const app= express()
-// const cors = require('cors')
-// app.use(cors())
+const getNewsData = () => {
+  return unirest
+    .get(zurl)
+    .headers({
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36",
+    })
+    .then((response) => {
+      let $ = cheerio.load(response.body);
+      let news_results = []; 
 
-// const url = 'https://www.theguardian.com/us'
+  $(".BGxR7d").each((i,el) => {
+    news_results.push({
+     //link: $(el).find("a").attr('href'),
+     title: $(el).find("div.mCBkyc").text(),
+     //date: $(el).find(".ZE0LJd span").text(),
+    })
+  })
 
-// app.get('/', function(req, res){
-//     res.json('This is my webscraper')
-// })
+  for(let i=0;i<news_results.length;i++) {
+    var titlez= news_results[i].title
+    const myRegex= new RegExp(keyword, "gi")
+    let result = myRegex.test(titlez)
+    if(result){
+      function party() {
+        console.log('\x07')
+        console.log("MATCH FOUND!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        for(let j=0;j<news_results.length;j++) {
+          var titlez2= news_results[j].title
+          let result2 = titlez2.match(myRegex)
+          if(result2) {
+            console.log(titlez2)
+          }
+        }
+        setTimeout(party, 3000)
+      }
+      return party()
+    }
+  }
+      console.log(news_results)
+      console.log('NOTHING FOUND___________NOTHING FOUND___________NOTHING FOUND')
+      setTimeout(getNewsData, 60000)
+      //console.log(news_results)
+    });
+};
 
-// app.get('/results', (req, res)=> {
-//     axios(url)
-//     .then(response=> {
-//         const html = response.data
-//         const $= cheerio.load(html)
-//         const articles = []
-//         $('.fc-item__title', html).each(function(){
-//             const title = $(this).text()
-//             const url= $(this).find('a').attr('href')
-//             articles.push({
-//                 title,url
-//             })
-//         })
-//         res.json(articles)
-        
-//     }).catch(err => console.log(err))
-// })
-// app.listen(PORT, ()=> console.log(`server running on PORT ${PORT}`))
-
-
-//////////////////////////////////ANIA tutorial END
-
-
-
-//////////////////////////////////////////////// LOOPRING START
-
-const PORT = 8000
-const axios = require('axios')
-const cheerio = require('cheerio')
-const express = require('express')
-
-const app= express()
-const url = 'https://medium.loopring.io/'
-
-function gogo() {
-    console.log(`visiting page: ${url}`)
-    axios(url)
-        .then(response=> {
-        const html = response.data
-        const myRegex= /q2/gi;
-        let result = html.match(myRegex)
-        console.log(result)
-            if(result.length>3){
-                console.log("QUARTER 2 REPORT HAS BEEN RELEASED!!!!!!!!!!!!!!!\n QUARTER 2 REPORT HAS BEEN RELEASED!!!!!!!!!!!!!!!\n QUARTER 2 REPORT HAS BEEN RELEASED!!!!!!!!!!!!!!!")
-                console.log('\x07')
-                function party(){
-                    setTimeout(()=>{console.log('\x07')}, 1000)
-                    setTimeout(party, 1000)
-                }
-                party()
-                
-            } else {
-                console.log("NOT FOUND!!!!!!!!!!!") 
-                setTimeout(gogo, 15000)
-            }
-        })
-    //app.listen(PORT, ()=> console.log(`server running on PORT ${PORT}`))
-    
-}
-
-gogo()
-
-// console.log(gogo())
-
-//setTimeout(tt(), 3000)
-
-
-
-// for(let i=0; i<10;i++) {
-//     setTimeout(gogo, 3000)
-// }
-
-
-
-
-
-///////////////////////////////////////LOOPRING END
-
-
-// const PORT = 8000
-// const axios = require('axios')
-// const cheerio = require('cheerio')
-// const express = require('express')
-
-// const app= express()
-// const url = 'https://www.bestbuy.com/site/nvidia-geforce-rtx-3070-8gb-gddr6-pci-express-4-0-graphics-card-dark-platinum-and-black/6429442.p?skuId=6429442'
-// axios(url)
-//     .then(response=> {
-//     const html = response.data
-//     const myRegex= /add\sto\scart/gi
-//     let result = html.match(myRegex)
-//         console.log(result)
-        
-//     })
-// app.listen(PORT, ()=> console.log(`server running on PORT ${PORT}`))
-
-
-
-
-
-
-////////////////
-// const PORT = 8000
-// const axios = require('axios')
-// const cheerio = require('cheerio')
-// const express = require('express')
-
-// const app= express()
-// const url = 'https://www.bestbuy.com/site/nvidia-geforce-rtx-3070-8gb-gddr6-pci-express-4-0-graphics-card-dark-platinum-and-black/6429442.p?skuId=6429442'
-// axios(url)
-//     .then(response=> {
-//     const html = response.data
-//     const $= cheerio.load(html)
-//     console.log($)
-//     })
-// app.listen(PORT, ()=> console.log(`server running on PORT ${PORT}`))
+getNewsData();
